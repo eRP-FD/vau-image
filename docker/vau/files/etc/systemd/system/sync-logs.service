@@ -1,0 +1,17 @@
+[Unit]
+Description=Send boot logs to journald/logdna
+After=network.target vau-config.service logdna-agent.service
+
+[Service]
+User=erp-processing-context
+Group=erp-processing-context
+
+Type=oneshot
+ExecStart=/usr/bin/logger -t VAU_config -f /var/log/vau-config.log
+ExecStart=/usr/bin/logger -t VAU_boot -f /var/log/dmesg
+ExecStartPre=/bin/sleep 10
+
+[Install]
+WantedBy=multi-user.target
+
+

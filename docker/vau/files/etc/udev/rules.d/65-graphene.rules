@@ -1,0 +1,3 @@
+KERNEL=="sgx_enclave", GROUP="erp-processing-context", OWNER="erp-processing-context", MODE="0660"
+KERNEL=="sgx_provision", GROUP="erp-processing-context", OWNER="erp-processing-context", MODE="0660"
+

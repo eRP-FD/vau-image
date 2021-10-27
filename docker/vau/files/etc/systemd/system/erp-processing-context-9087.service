@@ -1,0 +1,28 @@
+[Unit]
+Description=eRp Processing Context 9087
+After=network.target
+After=logdna-agent.service
+After=vau-config.service
+After=haproxy.service
+Before=disable-modules.service
+
+[Service]
+Restart=always
+RestartSec=10
+
+User=erp-processing-context
+Group=erp-processing-context
+
+WorkingDirectory=/erp/bin/
+Environment="SGX=1"
+Environment="ERP_SERVER_PORT=9087"
+Environment="ERP_LOG_DIR=/var/log/erp/9087/"
+EnvironmentFile=/var/config/erp-processing-context
+EnvironmentFile=-/var/config/erp-processing-context-secrets
+ExecStart=graphene-sgx erp-processing-context
+#ExecStart=/erp/bin/erp-processing-context
+ExecStop=/bin/kill -15 $MAINPID
+
+[Install]
+WantedBy=multi-user.target
+RequiredBy=disable-modules.service

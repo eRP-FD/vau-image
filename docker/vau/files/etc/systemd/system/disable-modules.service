@@ -1,0 +1,13 @@
+[Unit]
+Description=Disables module loading
+After=network.target vau-config.service erp-processing-context-9085.service erp-processing-context-9086.service erp-processing-context-9087.service erp-processing-context-9088.service
+
+[Service]
+Type=oneshot
+ExecStart=sysctl -w kernel.modules_disabled=1
+ExecStartPre=/bin/sleep 10
+
+[Install]
+WantedBy=multi-user.target
+
+

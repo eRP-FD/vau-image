@@ -1,0 +1,40 @@
+publishing {
+    publications {
+        filesystem(MavenPublication) {
+            artifactId = project.name
+            groupId = project.group
+            version = project.version
+
+            artifact (file('production_filesystem.squashfs')) {
+                classifier 'production'
+            }
+
+            artifact (file('debug_filesystem.squashfs')) {
+                classifier 'debug'
+            }
+        }
+
+        efi(MavenPublication) {
+            artifactId = 'efi'
+            groupId = project.group
+            version = project.version
+
+            artifact (file('pxe-boot.efi.production.signed')) {
+                classifier 'production'
+            }
+            artifact (file('pxe-boot.efi.debug.signed')){
+                classifier 'debug'
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            url 'https://nexus.epa-dev.net/repository/erp-raw-releases/'
+            credentials {
+                username nexusUsername
+                password nexusPassword
+            }
+        }
+    }
+}

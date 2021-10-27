@@ -1,0 +1,6 @@
+.idea
+.gradle
+docker/vau/erp
+docker/vau/debug
+build/
+!docker/build

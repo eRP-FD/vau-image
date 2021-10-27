@@ -1,0 +1,57 @@
+plugins {
+    id 'pl.allegro.tech.build.axion-release' version '1.10.2'
+    id 'maven-publish'
+}
+
+group = 'com.ibm.erp'
+description = 'eRp PC Filesystem'
+version = null
+
+apply from: 'gradle/release.gradle'
+apply from: 'gradle/publishing.gradle'
+
+repositories {
+    maven {
+        url "https://nexus.epa-dev.net/repository/erp-raw-releases/"
+        credentials {
+            username nexusUsername
+            password nexusPassword
+        }
+    }
+}
+
+configurations {
+    archiveConfig
+}
+
+scmVersion {
+    checks {
+        uncommittedChanges = false
+        aheadOfRemote = false
+        snapshotDependencies = false
+    }
+}
+
+ext.eRpPCVersion = '1.0.3'
+
+dependencies {
+    archiveConfig group:'com.ibm.erp', name:'erp-processing-context', version: eRpPCVersion, ext:'tar.gz'
+    archiveConfig group:'com.ibm.erp', name:'erp-processing-context', version: eRpPCVersion, classifier: 'debug', ext:'tar.gz'
+}
+
+//  tarTree(resources.gzip(archiveFile)) does not support symlinks
+task extractApp(type: Exec) {
+    def archivePath = project.configurations.archiveConfig.find { it.name.startsWith('erp-processing-context') && !it.name.contains('debug')}
+    println "Release: " + archivePath
+    executable 'tar'
+    args(['xzf', archivePath.absolutePath])
+    workingDir file("docker/vau")
+}
+
+task extractDebugApp(type: Exec) {
+    def archiveDebugPath = project.configurations.archiveConfig.find { it.name.startsWith('erp-processing-context')  && it.name.contains('debug') }
+    println "Debug: " + archiveDebugPath
+    executable 'tar'
+    args(['xzf', archiveDebugPath.absolutePath])
+    workingDir file("docker/vau")
+}

@@ -1,0 +1,51 @@
+[Unit]
+Description=eRp Processing Context Config
+
+Wants=network-online.target
+After=network-online.target
+
+After=systemd-networkd-wait-online.service
+Requires=systemd-networkd-wait-online.service
+
+Before=logdna-agent.service
+Before=rsyslog.service
+Before=dragent.service
+Before=chrony.service
+Before=haproxy.service
+Before=aesmd.service
+Before=graphene-token.service
+Before=erp-processing-context-9085.service
+Before=erp-processing-context-9086.service
+Before=erp-processing-context-9087.service
+Before=erp-processing-context-9088.service
+Before=disable-modules.service
+
+[Service]
+
+User=erp-processing-context
+Group=erp-processing-context
+
+Type=oneshot
+PermissionsStartOnly=true
+ExecStartPre=/bin/ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf
+ExecStartPre=/bin/ln -sf /var/config/hosts /etc/hosts
+ExecStartPre=/usr/sbin/dhclient bond1
+ExecStart=/bin/bash /usr/local/bin/vau-config.sh
+RemainAfterExit=yes
+Restart=never
+
+[Install]
+WantedBy=multi-user.target
+
+RequiredBy=logdna-agent.service
+RequiredBy=rsyslog.service
+RequiredBy=dragent.service
+RequiredBy=chrony.service
+RequiredBy=haproxy.service
+RequiredBy=aesmd.service
+RequiredBy=graphene-token.service
+RequiredBy=erp-processing-context-9085.service
+RequiredBy=erp-processing-context-9086.service
+RequiredBy=erp-processing-context-9087.service
+RequiredBy=erp-processing-context-9088.service
+RequiredBy=disable-modules.service

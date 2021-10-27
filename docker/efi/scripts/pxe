@@ -1,0 +1,85 @@
+#!/bin/bash
+mountroot()
+{
+        maxTryCount=2
+        squashfsFile="/tmp/rootfs.squashfs"
+        squashfshash="%SQUASHFS_HASH_PLACEHOLDER%"
+        imageRepoPath="repository/erp-raw-releases/com/ibm/erp/vau-image/%SQUASHFS_IMAGE_VERSION%/vau-image-%SQUASHFS_IMAGE_VERSION%-%RELEASE_TYPE%.squashfs"
+        imageRepoScheme="https"
+        imageRepoPort="8443"
+        squashfsMountPoint="/mnt/vau-ro"
+        tmpfsMountPoint="/mnt/vau-rw"
+        overlayfsUppderDir="$tmpfsMountPoint/upper"
+        overlayfsWorkDir="$tmpfsMountPoint/work"
+        overlayfsDir="/mnt/vau-ofs"
+        tryCount="1"
+
+        # make sure udevadm is up
+        wait_for_udev 10
+
+        # make sure kernel accepts sysrq, so we can force kernel panic in case of errors
+        echo 1 > /proc/sys/kernel/sysrq
+
+        # get rooturl from kernel command line
+        for x in $(cat /proc/cmdline); do
+                case $x in
+                rooturl=*)
+                        export rooturl=${x#rooturl=}
+                        ;;
+                maxTryCount=*)
+                        export maxTryCount=${x#maxTryCount=}
+                        ;;
+                esac
+        done
+
+        # load modules
+        modprobe squashfs || echo c > /proc/sysrq-trigger
+        modprobe af_packet || echo c > /proc/sysrq-trigger
+        modprobe overlay || echo c > /proc/sysrq-trigger
+
+        # configure network
+        configure_networking || echo c > /proc/sysrq-trigger
+
+        # prepare image repo uri
+        imageRepoIP="$(grep dhcp-server-identifier /var/lib/dhcp/dhclient.leases | uniq | cut -d' ' -f5 | cut -d';' -f1)"
+        imageRepoURI="${imageRepoScheme}://${imageRepoIP}:${imageRepoPort}/${imageRepoPath}"
+
+        # download rootfs
+        log_begin_msg "Downloading VAU squashfs with version %SQUASHFS_IMAGE_VERSION% %RELEASE_TYPE%"
+        while [ ! -f ${squashfsFile} ] && [ ${tryCount} -le ${maxTryCount} ]; do
+                /bin/wget -q --no-check-certificate ${imageRepoURI} -O ${squashfsFile} || log_failure_msg "Can't download rootfs, count ${tryCount}"
+                tryCount=$(( ${tryCount} + 1 ))
+                sleep 0.5
+        done
+
+        log_success_msg "VAU squashfs with version %SQUASHFS_IMAGE_VERSION% downloaded succesfully"
+        if [ -f ${squashfsFile} ]
+        then
+                # measure squashfs
+                squashfsnewhash="$(sha512sum ${squashfsFile} | cut -d ' ' -f 1)"
+                [ ${squashfsnewhash} = ${squashfshash} ] || echo c > /proc/sysrq-trigger
+        else
+                echo c > /proc/sysrq-trigger
+        fi
+
+        # mount rootfs
+        mkdir -p ${squashfsMountPoint}
+        mount -t squashfs -o loop ${squashfsFile} ${squashfsMountPoint} || echo c > /proc/sysrq-trigger
+
+        # mount tmpfs
+        mkdir -p ${tmpfsMountPoint}
+        mount -t tmpfs -o nodev,noexec,nosuid none ${tmpfsMountPoint} || echo c > /proc/sysrq-trigger
+
+        # mount overlayfs
+        mkdir -p ${overlayfsUppderDir} ${overlayfsWorkDir} ${overlayfsDir}
+        mount -t overlay overlay -o lowerdir=${squashfsMountPoint},upperdir=${overlayfsUppderDir},workdir=${overlayfsWorkDir} ${overlayfsDir} \
+                || echo c > /proc/sysrq-trigger
+
+        # move tmpfs and squashfs to new root
+        # mkdir -p ${overlayfsDir}${tmpfsMountPoint} ${overlayfsDir}${squashfsMountPoint}
+        # mount --move ${squashfsMountPoint} ${overlayfsDir}${squashfsMountPoint}  || echo c > /proc/sysrq-trigger
+        # mount --move ${tmpfsMountPoint} ${overlayfsDir}${tmpfsMountPoint}  || echo c > /proc/sysrq-trigger
+
+        # move overlayfs to new root
+        mount --move ${overlayfsDir} ${rootmnt}  || echo c > /proc/sysrq-trigger
+}

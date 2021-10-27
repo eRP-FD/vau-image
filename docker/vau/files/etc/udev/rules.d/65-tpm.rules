@@ -1,0 +1,3 @@
+KERNEL=="tpm[0-9]*", GROUP="erp-processing-context", OWNER="erp-processing-context", MODE="0600"
+KERNEL=="tpmrm[0-9]*", GROUP="erp-processing-context", OWNER="erp-processing-context", MODE="0600"
+
