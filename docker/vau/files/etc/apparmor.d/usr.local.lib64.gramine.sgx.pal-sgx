@@ -1,7 +1,7 @@
 # Last Modified: Thu Jul  8 11:28:24 2021
 #include <tunables/global>
 
-/usr/local/lib64/graphene/sgx/pal-sgx {
+/usr/lib/x86_64-linux-gnu/gramine/sgx/loader {
   #include <abstractions/base>
   #include <abstractions/nameservice>
   #include <abstractions/user-tmp>
@@ -11,7 +11,7 @@
   /etc/ r,
   /sys/devices/system/cpu/** r,
   /sys/devices/system/node/** r,
-  /usr/local/lib64/graphene/** r,
+  /usr/lib/x86_64-linux-gnu/gramine/** r,
   /var/config/debug/erp/bin/erp-processing-context.token r,
   /var/config/erp/bin/erp-processing-context.token r,
   owner /debug/ r,

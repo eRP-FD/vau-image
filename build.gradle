@@ -32,7 +32,7 @@ scmVersion {
     }
 }
 
-ext.eRpPCVersion = '1.0.9'
+ext.eRpPCVersion = '1.0.12'
 
 dependencies {
     archiveConfig group:'com.ibm.erp', name:'erp-processing-context', version: eRpPCVersion, ext:'tar.gz'

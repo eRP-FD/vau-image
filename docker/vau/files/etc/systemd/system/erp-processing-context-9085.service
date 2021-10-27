@@ -21,7 +21,7 @@ Environment="ERP_ENROLMENT_ACTIVATE_FOR_PORT=9085"
 Environment="ERP_LOG_DIR=/var/log/erp/9085/"
 EnvironmentFile=/var/config/erp-processing-context
 EnvironmentFile=-/var/config/erp-processing-context-secrets
-ExecStart=graphene-sgx erp-processing-context
+ExecStart=gramine-sgx erp-processing-context
 #ExecStart=/erp/bin/erp-processing-context
 ExecStop=/bin/kill -15 $MAINPID
 

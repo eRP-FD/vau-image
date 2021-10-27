@@ -1,6 +1,6 @@
 # ------------------------------------------  PRODUCTION --------------------------------------------------------------
 # https://github.ibmgcloud.net/eRp/vau-base-image
-FROM de.icr.io/erp_dev/vau-base-image:v-0.43.0 as production
+FROM de.icr.io/erp_dev/vau-base-image:v-0.45.0 as production
 
 SHELL ["/bin/bash", "-c"]
 
@@ -44,7 +44,7 @@ RUN mkdir -p /var/log/erp/{9085..9088} /etc/sysconfig /erp/bin \
     && ln -sf /var/config/erp/bin/erp-processing-context.token /erp/bin/erp-processing-context.token
 
 # Add apparmor files
-COPY files/etc/apparmor.d/usr.local.lib64.graphene.sgx.pal-sgx /etc/apparmor.d/usr.local.lib64.graphene.sgx.pal-sgx
+COPY files/etc/apparmor.d/usr.local.lib64.gramine.sgx.pal-sgx /etc/apparmor.d/usr.local.lib64.gramine.sgx.pal-sgx
 
 # Add non-priviledges user to run PC
 RUN useradd -d / -s /usr/sbin/nologin -U -r erp-processing-context
@@ -61,7 +61,7 @@ RUN chmod -R go-w /var/config
 # Enable services
 RUN systemctl enable aesmd \
     vau-config \
-    graphene-token \
+    gramine-token \
     disable-modules \
     sync-logs \
     erp-processing-context-9085.service
@@ -71,16 +71,17 @@ RUN systemctl enable aesmd \
 
 # Copy application files
 COPY --chown=erp-processing-context:erp-processing-context erp /erp
+
 RUN chmod u+x /erp/bin/erp-processing-context
 RUN openssl genrsa -3 -out /etc/enclave-key.pem 3072
 
 # Sign the manifest
 WORKDIR /erp/bin
-RUN PYTHONPATH=/usr/local/ graphene-sgx-sign \
-        --manifest /erp/bin/erp-processing-context.manifest \
-        --output   /erp/bin/erp-processing-context.manifest.sgx \
-        --libpal   /usr/local/lib64/graphene/sgx/libpal.so \
-        --key      /etc/enclave-key.pem
+RUN gramine-sgx-sign \
+    --manifest /erp/bin/erp-processing-context.manifest \
+    --output   /erp/bin/erp-processing-context.manifest.sgx \
+    --libpal   /usr/lib/x86_64-linux-gnu/gramine/sgx/libpal.so \
+    --key      /etc/enclave-key.pem
 
 # Main initialisation script
 ARG VAULT_SECRET_ID
@@ -145,14 +146,14 @@ RUN mkdir -p /var/config/debug/erp/bin \
 
 # Sign the manifest
 WORKDIR /debug/erp/bin
-RUN PYTHONPATH=/usr/local/ graphene-sgx-sign \
-        --manifest /debug/erp/bin/erp-processing-context.manifest \
-        --output   /debug/erp/bin/erp-processing-context.manifest.sgx \
-        --libpal   /usr/local/lib64/graphene/sgx/libpal.so \
-        --key      /etc/enclave-key.pem
+RUN gramine-sgx-sign \
+    --manifest /debug/erp/bin/erp-processing-context.manifest \
+    --output   /debug/erp/bin/erp-processing-context.manifest.sgx \
+    --libpal   /usr/lib/x86_64-linux-gnu/gramine/sgx/libpal.so \
+    --key      /etc/enclave-key.pem
 
 # Adjust new path in systemd services
-RUN sed -i "s|/erp/bin|/debug/erp/bin|g" /etc/systemd/system/erp*.service /etc/systemd/system/graphene-token.service /etc/aide/aide.conf
+RUN sed -i "s|/erp/bin|/debug/erp/bin|g" /etc/systemd/system/erp*.service /etc/systemd/system/gramine-token.service /etc/aide/aide.conf
 
 RUN aide -ic /etc/aide/aide.conf && \
     mv /etc/aide/aide.db.new /etc/aide/aide.db

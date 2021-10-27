@@ -1,5 +1,5 @@
 [Unit]
-Description=Graphene Token Generation
+Description=Gramine Token Generation
 After=network.target vau-config.service aesmd.service
 Requires=aesmd.service
 
@@ -7,7 +7,7 @@ Requires=aesmd.service
 ExecStartPre=/bin/sleep 3
 Environment="PYTHONPATH=/usr/local"
 WorkingDirectory=/erp/bin
-ExecStart=/usr/local/bin/graphene-sgx-get-token --sig /erp/bin/erp-processing-context.sig --output /var/config/erp/bin/erp-processing-context.token
+ExecStart=/usr/bin/gramine-sgx-get-token --sig /erp/bin/erp-processing-context.sig --output /var/config/erp/bin/erp-processing-context.token
 
 [Install]
 WantedBy=multi-user.target
