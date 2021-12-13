@@ -34,8 +34,6 @@ Please [visit for more details](docker/build/README.md)
 The artifacts in this repository are all build by Jenkins. 
 The steps can be found in the [Jenkinsfile](Jenkinsfile).
 
-https://jenkins.epa-dev.net/job/eRp/job/eRp/job/vau-image/
-
 ### Manual Build
 The VAU image and EFI bootloader can be build with docker.
 
