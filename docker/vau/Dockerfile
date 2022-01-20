@@ -1,6 +1,6 @@
 # ------------------------------------------  PRODUCTION --------------------------------------------------------------
 # https://github.ibmgcloud.net/eRp/vau-base-image
-FROM de.icr.io/erp_dev/vau-base-image:v-0.46.0 as production
+FROM de.icr.io/erp_dev/vau-base-image:v-0.47.0 as production
 
 SHELL ["/bin/bash", "-c"]
 
