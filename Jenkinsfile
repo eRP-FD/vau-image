@@ -27,10 +27,11 @@ pipeline {
             when {
                 anyOf {
                     branch 'master'
+                    branch 'release/*'
                 }
             }
             steps {
-                gradleCreateRelease()
+                gradleCreateReleaseEpa()
             }
         }
 
@@ -169,6 +170,7 @@ pipeline {
              when {
                  anyOf {
                      branch 'master'
+                     branch 'release/*'
                  }
              }
              steps {
@@ -180,6 +182,7 @@ pipeline {
             when {
                 anyOf {
                     branch 'master'
+                    branch 'release/*'
                 }
             }
             steps {
