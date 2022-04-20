@@ -6,6 +6,7 @@
   #include <abstractions/nameservice>
   #include <abstractions/user-tmp>
 
+  unix (bind, listen) addr=@/gramine/*/*,
   /debug/erp/** r,
   /erp/** r,
   /etc/ r,
@@ -14,6 +15,7 @@
   /usr/lib/x86_64-linux-gnu/gramine/** r,
   /var/config/debug/erp/bin/erp-processing-context.token r,
   /var/config/erp/bin/erp-processing-context.token r,
+  /etc/ssl/openssl.cnf r,
   owner /debug/ r,
   owner /debug/erp/ r,
   owner /debug/erp/bin/h80fffffd.bin rw,

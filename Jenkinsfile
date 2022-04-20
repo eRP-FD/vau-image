@@ -13,6 +13,8 @@ pipeline {
     environment {
          DEBUG_ROOT_HASH = credentials('erp_vau_debug_root_hash')
          VAULT_SECRET_ID = sh (script: 'openssl rand -base64 12', returnStdout: true).trim()
+         VAULT_SIGN_KEYS_PATH = "certs"
+        //VAULT_SIGN_KEYS_PATH = "certs_20220201"
      }
 
     stages {
@@ -31,7 +33,7 @@ pipeline {
                 }
             }
             steps {
-                gradleCreateReleaseEpa()
+                gradleCreateVersionRelease()
             }
         }
 
@@ -42,6 +44,24 @@ pipeline {
             }
         }
 
+        stage('Load PU signing keys from Vault (sysdig)') {
+            steps {
+                script {
+                    def secrets = [
+                            [$class      : 'VaultSecret', path: "secret/eRp/environments/pu/efi/${env.VAULT_SIGN_KEYS_PATH}",
+                             secretValues: [
+                                     [$class: 'VaultSecretValue', envVar: 'DB_CRT', vaultKey: 'db.crt'],
+                                     [$class: 'VaultSecretValue', envVar: 'DB_KEY', vaultKey: 'db.key']]
+                            ]
+                    ]
+                    wrap([$class: 'VaultBuildWrapper', vaultSecrets: secrets]) {
+                        sh "set +x && echo '${env.DB_CRT}' > docker/vau/files/certs/db.crt && set -x"
+                        sh "set +x && echo '${env.DB_KEY}' > docker/vau/files/certs/db.key && set -x"
+                    }
+                }
+            }
+        }
+
         stage('Extract filesystem from containers') {
             steps {
                 script {
@@ -49,8 +69,10 @@ pipeline {
                         sh 'docker build --build-arg "VAULT_SECRET_ID=${VAULT_SECRET_ID}" --target production -t production_filesystem docker/vau'
                         sh 'docker build --build-arg "VAULT_SECRET_ID=${VAULT_SECRET_ID}" --build-arg "DEBUG_ROOT_HASH=$DEBUG_ROOT_HASH" --target debug -t debug_filesystem docker/vau'
                         sh 'mkdir production_filesystem debug_filesystem'
-                        sh 'docker export $(docker create production_filesystem) --output production_filesystem/production_filesystem.tar'
-                        sh 'docker export $(docker create debug_filesystem) --output debug_filesystem/debug_filesystem.tar'
+                        sh 'docker export $(docker create --rm production_filesystem) --output production_filesystem/production_filesystem.tar'
+                        sh 'docker export $(docker create --rm debug_filesystem) --output debug_filesystem/debug_filesystem.tar'
+                        sh 'docker rmi -f production_filesystem debug_filesystem'
+                        sh 'rm -rf docker/vau/files/certs/*'
                     }
                     createSummary('user.png').appendText("<h3>Vault Secret</h3><p>Value: <b>${env.VAULT_SECRET_ID}</b></p>", false, false, false, 'black')
                 }
@@ -96,7 +118,7 @@ pipeline {
             steps {
                 script {
                     def secrets = [
-                            [$class      : 'VaultSecret', path: "secret/eRp/environments/rutu/efi/certs",
+                            [$class      : 'VaultSecret', path: "secret/eRp/environments/rutu/efi/${env.VAULT_SIGN_KEYS_PATH}",
                              secretValues: [
                                      [$class: 'VaultSecretValue', envVar: 'DB_CRT', vaultKey: 'db.crt'],
                                      [$class: 'VaultSecretValue', envVar: 'DB_KEY', vaultKey: 'db.key']]
@@ -123,6 +145,7 @@ pipeline {
                         docker/efi
                         """
                         sh "docker cp \$(docker create --rm debug_efi):pxe-boot.efi.signed pxe-boot.efi.debug.signed"
+                        sh 'docker rmi -f debug_efi'
                         sh 'rm -rf docker/efi/certs/*'
                     }
                 }
@@ -133,7 +156,7 @@ pipeline {
             steps {
                 script {
                     def secrets = [
-                            [$class      : 'VaultSecret', path: "secret/eRp/environments/pu/efi/certs",
+                            [$class      : 'VaultSecret', path: "secret/eRp/environments/pu/efi/${env.VAULT_SIGN_KEYS_PATH}",
                              secretValues: [
                                      [$class: 'VaultSecretValue', envVar: 'DB_CRT', vaultKey: 'db.crt'],
                                      [$class: 'VaultSecretValue', envVar: 'DB_KEY', vaultKey: 'db.key']]
@@ -160,6 +183,7 @@ pipeline {
                         docker/efi
                         """
                         sh "docker cp \$(docker create --rm production_efi):pxe-boot.efi.signed pxe-boot.efi.production.signed"
+                        sh 'docker rmi -f production_efi'
                         sh 'rm -rf docker/efi/certs/*'
                     }
                 }

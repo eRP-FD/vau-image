@@ -1,6 +1,6 @@
 # ------------------------------------------  PRODUCTION --------------------------------------------------------------
 # https://github.ibmgcloud.net/eRp/vau-base-image
-FROM de.icr.io/erp_dev/vau-base-image:v-0.47.0 as production
+FROM de.icr.io/erp_dev/vau-base-image:v-2.1.2 as production
 
 SHELL ["/bin/bash", "-c"]
 
@@ -14,25 +14,13 @@ RUN chmod +x /usr/local/bin/redis-healthcheck.sh /usr/local/bin/redis-cli
 RUN mkdir -p /var/config/{erp,haproxy,rsyslog.d} \
     && mkdir -p /var/config/erp/{bin,config,tsl,hsm} \
     && mkdir -p /var/config/haproxy/secrets \
-    && touch /var/config/dragent.yaml \
-    && touch /var/config/logdna.conf \
-    && touch /var/config/hosts \
-    && touch /var/config/vault.json \
-    && touch /var/config/erp-processing-context \
-    && touch /var/config/erp-processing-context-secrets \
-    && touch /var/config/erp-processing-context-secrets \
+    && touch /var/config/{hosts,dragent.yaml,logdna.conf,vault.json,erp-processing-context,erp-processing-context-secrets} \
     && touch /var/config/erp/bin/erp-processing-context.token \
-    && touch /var/config/erp/config/POSTGRES_CERTIFICATE \
-    && touch /var/config/erp/config/POSTGRES_SSL_CERTIFICATE \
-    && touch /var/config/erp/config/POSTGRES_SSL_KEY \
-    && touch /var/config/erp/config/TSL_SSL_cert_chain.pem \
-    && touch /var/config/erp/config/sslRootCaPath \
-    && touch /var/config/erp/tsl/tsl-1.xml \
-    && touch /var/config/erp/tsl/tsl-ca.der \
+    && touch /var/config/erp/config/{POSTGRES_CERTIFICATE,POSTGRES_SSL_CERTIFICATE,POSTGRES_SSL_KEY,TSL_SSL_cert_chain.pem,sslRootCaPath} \
+    && touch /var/config/erp/tsl/{tsl-1.xml,tsl-ca.der} \
     && touch /var/config/erp/hsm/work-keyspec \
     && touch /var/config/rsyslog.d/rsyslog-forward.conf \
-    && touch /var/config/haproxy/secrets/redis_password \
-    && touch /var/config/haproxy/secrets/ca.crt \
+    && touch /var/config/haproxy/secrets/{redis_password,ca.crt} \
     && touch /var/config/haproxy/haproxy
 
 # Create symlinks for all configs and logging support
@@ -44,7 +32,7 @@ RUN mkdir -p /var/log/erp/{9085..9088} /etc/sysconfig /erp/bin \
     && ln -sf /var/config/erp/bin/erp-processing-context.token /erp/bin/erp-processing-context.token
 
 # Add apparmor files
-COPY files/etc/apparmor.d/usr.local.lib64.gramine.sgx.pal-sgx /etc/apparmor.d/usr.local.lib64.gramine.sgx.pal-sgx
+COPY files/etc/apparmor.d/usr.lib.x86_64-linux-gnu.gramine.sgx.loader /etc/apparmor.d/usr.lib.x86_64-linux-gnu.gramine.sgx.loader
 
 # Add non-priviledges user to run PC
 RUN useradd -d / -s /usr/sbin/nologin -U -r erp-processing-context
@@ -87,6 +75,13 @@ RUN gramine-sgx-sign \
 ARG VAULT_SECRET_ID
 RUN sed -i "s|%VAULT_SECRET_ID%|${VAULT_SECRET_ID}|g" /usr/local/bin/vau-config.sh
 
+# Sign the sysdig kernel module (sysdigcloud-probe.ko )
+# KERNEL_VERSION is defined in the base image
+# Certificates are read from Hashicorp Vault
+COPY files/certs/* /boot/
+RUN /usr/src/linux-headers-${KERNEL_VERSION}/scripts/sign-file sha256 /boot/db.key /boot/db.crt \
+            /lib/modules/${KERNEL_VERSION}/updates/dkms/sysdigcloud-probe.ko
+
 # Remove extra files
 RUN rm -r /boot \
     && rm /.dockerenv \
@@ -100,7 +95,7 @@ RUN aide -ic /etc/aide/aide.conf && \
 # ------------------------------------------  DEBUG --------------------------------------------------------------
 # Create debug image
 # This is not based on the previous layer as apt is not available
-FROM de.icr.io/erp_dev/ubuntu-focal:20210713 as debug
+FROM de.icr.io/erp_dev/ubuntu-focal:20220105 as debug
 
 SHELL ["/bin/bash", "-c"]
 
