@@ -1,6 +1,6 @@
 # ------------------------------------------  PRODUCTION --------------------------------------------------------------
 # https://github.ibmgcloud.net/eRp/vau-base-image
-FROM de.icr.io/erp_dev/vau-base-image:v-2.1.2 as production
+FROM de.icr.io/erp_dev/vau-base-image:v-2.2.2 as production
 
 SHELL ["/bin/bash", "-c"]
 
@@ -65,6 +65,7 @@ RUN openssl genrsa -3 -out /etc/enclave-key.pem 3072
 
 # Sign the manifest
 WORKDIR /erp/bin
+
 RUN gramine-sgx-sign \
     --manifest /erp/bin/erp-processing-context.manifest \
     --output   /erp/bin/erp-processing-context.manifest.sgx \
