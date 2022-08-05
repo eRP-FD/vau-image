@@ -13,7 +13,6 @@ pipeline {
     environment {
          DEBUG_ROOT_HASH = credentials('erp_vau_debug_root_hash')
          VAULT_SECRET_ID = sh (script: 'openssl rand -base64 12', returnStdout: true).trim()
-         //VAULT_SIGN_KEYS_PATH = "certs"
          VAULT_SIGN_KEYS_PATH = "certs_20220201"
      }
 

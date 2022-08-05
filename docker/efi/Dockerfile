@@ -1,6 +1,6 @@
-FROM de.icr.io/erp_dev/ubuntu-focal:20220105
+FROM de.icr.io/erp_dev/ubuntu-focal:20220531
 
-ENV KERNEL_VERSION=5.13.0-27-generic
+ENV KERNEL_VERSION=5.15.0-41-generic
 
 SHELL ["/bin/bash", "-c"]
 

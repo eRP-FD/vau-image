@@ -1,6 +1,6 @@
 # ------------------------------------------  PRODUCTION --------------------------------------------------------------
 # https://github.ibmgcloud.net/eRp/vau-base-image
-FROM de.icr.io/erp_dev/vau-base-image:v-2.2.4 as production
+FROM de.icr.io/erp_dev/vau-base-image:v-2.3.1 as production
 
 SHELL ["/bin/bash", "-c"]
 
@@ -65,7 +65,6 @@ RUN openssl genrsa -3 -out /etc/enclave-key.pem 3072
 
 # Sign the manifest
 WORKDIR /erp/bin
-
 RUN gramine-sgx-sign \
     --manifest /erp/bin/erp-processing-context.manifest \
     --output   /erp/bin/erp-processing-context.manifest.sgx \
@@ -96,7 +95,7 @@ RUN aide -ic /etc/aide/aide.conf && \
 # ------------------------------------------  DEBUG --------------------------------------------------------------
 # Create debug image
 # This is not based on the previous layer as apt is not available
-FROM de.icr.io/erp_dev/ubuntu-focal:20220105 as debug
+FROM de.icr.io/erp_dev/ubuntu-focal:20220531 as debug
 
 SHELL ["/bin/bash", "-c"]
 
