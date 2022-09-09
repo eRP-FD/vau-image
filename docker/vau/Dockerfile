@@ -1,6 +1,11 @@
 # ------------------------------------------  PRODUCTION --------------------------------------------------------------
+
 # https://github.ibmgcloud.net/eRp/vau-base-image
-FROM de.icr.io/erp_dev/vau-base-image:v-2.3.1 as production
+ARG VAU_BASE_IMAGE_VERSION=v-2.3.3
+# Should be the same as what the VAU base image is based on
+ARG DEBUG_IMAGE_BASE=de.icr.io/erp_dev/ubuntu-focal:20220801
+
+FROM de.icr.io/erp_dev/vau-base-image:${VAU_BASE_IMAGE_VERSION} as production
 
 SHELL ["/bin/bash", "-c"]
 
@@ -95,7 +100,7 @@ RUN aide -ic /etc/aide/aide.conf && \
 # ------------------------------------------  DEBUG --------------------------------------------------------------
 # Create debug image
 # This is not based on the previous layer as apt is not available
-FROM de.icr.io/erp_dev/ubuntu-focal:20220531 as debug
+FROM ${DEBUG_IMAGE_BASE} as debug
 
 SHELL ["/bin/bash", "-c"]
 

@@ -44,6 +44,12 @@ pipeline {
         }
 
         stage('Load PU signing keys from Vault (sysdig)') {
+            when {
+                anyOf {
+                    branch 'master'
+                    branch 'release/*'
+                }
+            }
             steps {
                 script {
                     def secrets = [
@@ -62,6 +68,12 @@ pipeline {
         }
 
         stage('Extract filesystem from containers') {
+            when {
+                anyOf {
+                    branch 'master'
+                    branch 'release/*'
+                }
+            }
             steps {
                 script {
                     withDockerRegistry(registry: [url: 'https://de.icr.io/v2/', credentialsId: 'icr_image_pusher_erp_dev_api_key']) {
@@ -79,6 +91,12 @@ pipeline {
         }
 
         stage('Create squashed filesystems') {
+            when {
+                anyOf {
+                    branch 'master'
+                    branch 'release/*'
+                }
+            }
             agent {
                 docker {
                     label 'dockerstage'
@@ -114,6 +132,12 @@ pipeline {
          }
 
         stage('Load RUTU signing keys from Vault') {
+            when {
+                anyOf {
+                    branch 'master'
+                    branch 'release/*'
+                }
+            }
             steps {
                 script {
                     def secrets = [
@@ -132,6 +156,12 @@ pipeline {
         }
 
         stage('Build and sign RUTU EFI PXE bootloader') {
+            when {
+                anyOf {
+                    branch 'master'
+                    branch 'release/*'
+                }
+            }
             steps {
                 script {
                     withDockerRegistry(registry: [url: 'https://de.icr.io/v2/', credentialsId: 'icr_image_pusher_erp_dev_api_key']) {
@@ -152,6 +182,12 @@ pipeline {
         }
 
         stage('Load PU signing keys from Vault') {
+            when {
+                anyOf {
+                    branch 'master'
+                    branch 'release/*'
+                }
+            }
             steps {
                 script {
                     def secrets = [
@@ -170,6 +206,12 @@ pipeline {
         }
 
         stage('Build and sign PU EFI PXE bootloader') {
+            when {
+                anyOf {
+                    branch 'master'
+                    branch 'release/*'
+                }
+            }
             steps {
                 script {
                     withDockerRegistry(registry: [url: 'https://de.icr.io/v2/', credentialsId: 'icr_image_pusher_erp_dev_api_key']) {
