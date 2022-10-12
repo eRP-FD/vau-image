@@ -1,4 +1,4 @@
-FROM de.icr.io/erp_dev/ubuntu-focal:20220801
+FROM de.icr.io/erp_dev/ubuntu-focal:20220826
 
 ENV KERNEL_VERSION=5.13.0-52-generic
 
