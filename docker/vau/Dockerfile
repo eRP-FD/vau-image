@@ -1,10 +1,10 @@
 # ------------------------------------------  PRODUCTION --------------------------------------------------------------
 
 # https://github.ibmgcloud.net/eRp/vau-base-image
-ARG VAU_BASE_IMAGE_VERSION=v-2.4.1
+ARG VAU_BASE_IMAGE_VERSION=v-2.5.0-B86
 
 # Should be the same as what the VAU base image is based on
-ARG DEBUG_IMAGE_BASE=de.icr.io/erp_dev/ubuntu-focal:20220826
+ARG DEBUG_IMAGE_BASE=de.icr.io/erp_dev/ubuntu-focal:20221130
 
 FROM de.icr.io/erp_dev/vau-base-image:${VAU_BASE_IMAGE_VERSION} as production
 
