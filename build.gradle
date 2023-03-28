@@ -33,7 +33,7 @@ scmVersion {
 }
 
 // Version without "v-"
-ext.eRpPCVersion = '2.5.0-B475'
+ext.eRpPCVersion = '2.5.4'
 
 
 dependencies {
