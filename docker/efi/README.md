@@ -7,7 +7,7 @@ This folder contains the files to build and sign the EFI bootloader.
 ## Dependencies
 
 * The certs/ folder have to contain the signing certificate and key. Please see [more details](certs/README.md).
-* Have access to de.icr.io/erp_dev/ubuntu-focal:20230301, or pull the ubuntu focal image and retag it to match the name
+* Have access to de.icr.io/erp_dev/focal:20230308, or pull the ubuntu image and retag it to match the name
 of the base image in the Dockerfile
 
 ## Folder structure

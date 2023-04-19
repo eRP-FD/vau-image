@@ -1,4 +1,4 @@
-FROM de.icr.io/erp_dev/ubuntu-focal:20230301
+FROM de.icr.io/erp_dev/ubuntu-focal:20230308
 
 RUN apt-get update
 RUN apt-get -y install --no-install-recommends \
