@@ -1,17 +1,10 @@
-#
-# (C) Copyright IBM Deutschland GmbH 2021, 2023
-# (C) Copyright IBM Corp. 2021, 2023
-#
-# non-exclusively licensed to gematik GmbH
-#
-
 # ------------------------------------------  PRODUCTION --------------------------------------------------------------
 
 # https://github.ibmgcloud.net/eRp/vau-base-image
-ARG VAU_BASE_IMAGE_VERSION=v-2.6.1
+ARG VAU_BASE_IMAGE_VERSION=v-2.7.0-B97
 
 # Should be the same as what the VAU base image is based on
-ARG DEBUG_IMAGE_BASE=de.icr.io/erp_dev/ubuntu-focal:20230412
+ARG DEBUG_IMAGE_BASE=de.icr.io/erp_dev/ubuntu-jammy:20230522
 
 FROM de.icr.io/erp_dev/vau-base-image:${VAU_BASE_IMAGE_VERSION} as production
 
@@ -20,8 +13,6 @@ SHELL ["/bin/bash", "-c"]
 # Copy files.
 COPY files/etc/ /etc/
 COPY files/usr/local/bin/* /usr/local/bin/
-
-RUN chmod +x /usr/local/bin/redis-healthcheck.sh /usr/local/bin/redis-cli
 
 # Create file structure for aide
 RUN mkdir -p /var/config/{erp,haproxy,rsyslog.d} \
@@ -62,7 +53,6 @@ RUN chmod -R go-w /var/config
 # Enable services
 RUN systemctl enable aesmd \
     vau-config \
-    gramine-token \
     disable-modules \
     sync-logs \
     erp-processing-context-9085.service
@@ -83,6 +73,9 @@ RUN gramine-sgx-sign \
     --output   /erp/bin/erp-processing-context.manifest.sgx \
     --libpal   /usr/lib/x86_64-linux-gnu/gramine/sgx/libpal.so \
     --key      /etc/enclave-key.pem
+
+## Ubuntu 22.04 + chrony 4.2 will not update time in a container so, a fix is required.
+RUN sed -i '/^SYNC_IN_CONTAINER/s/no/yes/' /etc/default/chrony
 
 # Main initialisation script
 ARG VAULT_SECRET_ID
@@ -161,7 +154,7 @@ RUN gramine-sgx-sign \
     --key      /etc/enclave-key.pem
 
 # Adjust new path in systemd services
-RUN sed -i "s|/erp/bin|/debug/erp/bin|g" /etc/systemd/system/erp*.service /etc/systemd/system/gramine-token.service /etc/aide/aide.conf
+RUN sed -i "s|/erp/bin|/debug/erp/bin|g" /etc/systemd/system/erp*.service /etc/aide/aide.conf
 
 RUN aide -ic /etc/aide/aide.conf && \
     mv /etc/aide/aide.db.new /etc/aide/aide.db
