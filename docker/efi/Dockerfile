@@ -1,6 +1,13 @@
-FROM de.icr.io/erp_dev/ubuntu-jammy:20230522
+#
+# (C) Copyright IBM Deutschland GmbH 2021, 2023
+# (C) Copyright IBM Corp. 2021, 2023
+#
+# non-exclusively licensed to gematik GmbH
+#
 
-ENV KERNEL_VERSION=5.19.0-41-generic
+FROM de.icr.io/erp_dev/ubuntu-focal:20230624
+
+ENV KERNEL_VERSION=5.13.0-52-generic
 
 SHELL ["/bin/bash", "-c"]
 
