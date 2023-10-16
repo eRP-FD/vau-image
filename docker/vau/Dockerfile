@@ -1,7 +1,7 @@
 # ------------------------------------------  PRODUCTION --------------------------------------------------------------
 
 # https://github.ibmgcloud.net/eRp/vau-base-image
-ARG VAU_BASE_IMAGE_VERSION=v-2.7.3
+ARG VAU_BASE_IMAGE_VERSION=v-2.7.7
 
 # Should be the same as what the VAU base image is based on
 ARG DEBUG_IMAGE_BASE=de.icr.io/erp_dev/ubuntu-jammy:20230624
@@ -89,9 +89,9 @@ RUN /usr/src/linux-headers-${KERNEL_VERSION}/scripts/sign-file sha256 /boot/db.k
             /lib/modules/${KERNEL_VERSION}/updates/dkms/sysdigcloud-probe.ko
 
 # Remove extra files
-RUN rm -r /boot \
-    && rm /.dockerenv \
-    && rm /usr/bin/su
+RUN rm -rf /boot \
+    && rm -f /.dockerenv \
+    && rm -f /usr/bin/su
 
 # Create the aide database, all filesystem changes should be done before this step
 RUN chmod 644 /etc/logrotate.d/logdna-agent
