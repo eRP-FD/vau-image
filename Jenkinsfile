@@ -13,7 +13,7 @@ pipeline {
     environment {
          DEBUG_ROOT_HASH = credentials('erp_vau_debug_root_hash')
          VAULT_SECRET_ID = sh (script: 'openssl rand -base64 12', returnStdout: true).trim()
-         VAULT_SIGN_KEYS_PATH = "certs_20220201"
+         VAULT_SIGN_KEYS_PATH = "certs_20240422"
      }
 
     stages {
@@ -252,6 +252,25 @@ pipeline {
             }
             steps {
                 finishRelease()
+            }
+        }
+    }
+
+    post {
+        failure {
+            script {
+                if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME.startsWith("release/")) {
+                    slackSendClient(message: "Build ${env.BUILD_DISPLAY_NAME} failed for branch `${env.BRANCH_NAME}`:rotating_light: \nFor more details visit <${env.BUILD_URL}|the build page>",
+                                    channel: '#erp-cpp')
+                }
+            }
+        }
+        fixed {
+            script {
+                if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME.startsWith("release/")) {
+                    slackSendClient(message: "Build is now successful again on branch `${env.BRANCH_NAME}`:green_heart:",
+                                    channel: '#erp-cpp')
+                }
             }
         }
     }
