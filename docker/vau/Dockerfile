@@ -1,7 +1,7 @@
 # ------------------------------------------  PRODUCTION --------------------------------------------------------------
 
 # https://<gitrepo>/eRp/vau-base-image
-ARG VAU_BASE_IMAGE_VERSION=v-2.9.3
+ARG VAU_BASE_IMAGE_VERSION=v-2.10.0-B121
 
 # Should be the same as what the VAU base image is based on
 ARG DEBUG_IMAGE_BASE=de.icr.io/erp_dev/ubuntu-jammy:20240405
@@ -105,11 +105,9 @@ FROM ${DEBUG_IMAGE_BASE} as debug
 
 SHELL ["/bin/bash", "-c"]
 
-# Copy everything from the VAU image
-COPY --from=production / /
-
 # Install additional debug software
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install --no-install-recommends \
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get -y install --no-install-recommends \
     ssh \
     vim \
     strace \
@@ -117,6 +115,9 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -y install --no-install-recommends \
     iproute2 \
     apparmor-utils \
   && rm -rf /var/lib/apt/lists/*
+
+# Copy everything from the VAU image and allow ssh access to debug
+COPY --from=production / /
 
 COPY files/debug/debug_sshd.conf /etc/ssh/sshd_config
 
