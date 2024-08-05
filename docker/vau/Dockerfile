@@ -1,7 +1,7 @@
 # ------------------------------------------  PRODUCTION --------------------------------------------------------------
 
 # https://<gitrepo>/eRp/vau-base-image
-ARG VAU_BASE_IMAGE_VERSION=v-2.10.0-B121
+ARG VAU_BASE_IMAGE_VERSION=v-2.12.0-B126
 
 # Should be the same as what the VAU base image is based on
 ARG DEBUG_IMAGE_BASE=de.icr.io/erp_dev/ubuntu-jammy:20240405
@@ -119,12 +119,18 @@ RUN apt-get update && \
     apparmor-utils \
   && rm -rf /var/lib/apt/lists/*
 
+# Backup users before copying from production
+RUN cp -a /etc/passwd /etc/shadow /etc/group /etc/gshadow /root/
+
 # Copy everything else from production VAU image and allow ssh access to debug
 COPY --from=production / /
 
 COPY files/debug/debug_sshd.conf /etc/ssh/sshd_config
 
 RUN sed -i '/^COMMIT/i -A INPUT -p tcp -m tcp --dport 22 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT' /etc/iptables/rules.v4
+
+# Restore ssh user and group
+RUN mv -f /root/passwd /root/shadow /root/group /root/gshadow /etc/
 
 # Generate a strong password and then generate the hash with the command: openssl passwd -6
 ARG DEBUG_ROOT_HASH
