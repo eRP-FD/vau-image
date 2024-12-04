@@ -5,15 +5,15 @@ Wants=network-online.target
 After=network-online.target
 
 After=systemd-networkd-wait-online.service
+After=chrony.service
 Requires=systemd-networkd-wait-online.service
 
-Before=logdna-agent.service
 Before=rsyslog.service
 Before=dragent.service
-Before=chrony.service
 Before=haproxy.service
 Before=aesmd.service
 Before=erp-processing-context-9085.service
+Before=erp-exporter.service
 Before=erp-processing-context-9086.service
 Before=erp-processing-context-9087.service
 Before=erp-processing-context-9088.service
@@ -21,8 +21,6 @@ Before=disable-modules.service
 
 [Service]
 
-User=erp-processing-context
-Group=erp-processing-context
 
 Type=oneshot
 PermissionsStartOnly=true
@@ -36,13 +34,12 @@ Restart=never
 [Install]
 WantedBy=multi-user.target
 
-RequiredBy=logdna-agent.service
 RequiredBy=rsyslog.service
 RequiredBy=dragent.service
-RequiredBy=chrony.service
 RequiredBy=haproxy.service
 RequiredBy=aesmd.service
 RequiredBy=erp-processing-context-9085.service
+RequiredBy=erp-exporter.service
 RequiredBy=erp-processing-context-9086.service
 RequiredBy=erp-processing-context-9087.service
 RequiredBy=erp-processing-context-9088.service

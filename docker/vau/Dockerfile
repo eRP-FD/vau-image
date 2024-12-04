@@ -1,10 +1,10 @@
 # ------------------------------------------  PRODUCTION --------------------------------------------------------------
 
 # https://<gitrepo>/eRp/vau-base-image
-ARG VAU_BASE_IMAGE_VERSION=v-2.12.2
+ARG VAU_BASE_IMAGE_VERSION=v-2.13.0-B131
 
 # Should be the same as what the VAU base image is based on
-ARG DEBUG_IMAGE_BASE=de.icr.io/erp_dev/ubuntu-jammy:20240405
+ARG DEBUG_IMAGE_BASE=de.icr.io/erp_dev/ubuntu-jammy:20240911.1
 
 FROM de.icr.io/erp_dev/vau-base-image:${VAU_BASE_IMAGE_VERSION} as production
 
@@ -18,8 +18,9 @@ COPY files/usr/local/bin/* /usr/local/bin/
 RUN mkdir -p /var/config/{erp,haproxy,rsyslog.d} \
     && mkdir -p /var/config/erp/{bin,config,tsl,hsm} \
     && mkdir -p /var/config/haproxy/secrets \
-    && touch /var/config/{hosts,dragent.yaml,logdna.conf,vault.json,erp-processing-context,erp-processing-context-secrets} \
+    && touch /var/config/{hosts,dragent.yaml,logdna.conf,vault.json,erp-processing-context,erp-processing-context-secrets,erp-exporter,erp-exporter-secrets} \
     && touch /var/config/erp/bin/erp-processing-context.token \
+    && touch /var/config/erp/bin/medication-exporter.token \
     && touch /var/config/erp/config/{POSTGRES_CERTIFICATE,POSTGRES_SSL_CERTIFICATE,POSTGRES_SSL_KEY,TSL_SSL_cert_chain.pem,sslRootCaPath} \
     && touch /var/config/erp/tsl/{tsl-1.xml,tsl-ca.der} \
     && touch /var/config/erp/hsm/work-keyspec \
@@ -33,7 +34,8 @@ RUN mkdir -p /var/log/erp/{9085..9088} /etc/sysconfig /erp/bin \
     && ln -fs /var/config/logdna.conf /etc/logdna.conf \
     && ln -fs /var/config/dragent.yaml /opt/draios/etc/dragent.yaml \
     && ln -fs /var/config/haproxy/haproxy /etc/sysconfig/haproxy \
-    && ln -sf /var/config/erp/bin/erp-processing-context.token /erp/bin/erp-processing-context.token
+    && ln -sf /var/config/erp/bin/erp-processing-context.token /erp/bin/erp-processing-context.token \
+    && ln -sf /var/config/erp/bin/medication-exporter.token /erp/bin/medication-exporter.token
 
 # Add apparmor files
 COPY files/etc/apparmor.d/usr.lib.x86_64-linux-gnu.gramine.sgx.loader /etc/apparmor.d/usr.lib.x86_64-linux-gnu.gramine.sgx.loader
@@ -55,6 +57,7 @@ RUN systemctl enable aesmd \
     vau-config \
     disable-modules \
     sync-logs \
+    erp-exporter.service \
     erp-processing-context-9085.service
 #    erp-processing-context-9086.service \
 #    erp-processing-context-9087.service \
@@ -63,7 +66,7 @@ RUN systemctl enable aesmd \
 # Copy application files
 COPY --chown=erp-processing-context:erp-processing-context erp /erp
 
-RUN chmod u+x /erp/bin/erp-processing-context
+RUN chmod u+x /erp/bin/erp-processing-context /erp/bin/erp-medication-exporter
 RUN openssl genrsa -3 -out /etc/enclave-key.pem 3072
 
 # Sign the manifest
@@ -71,6 +74,12 @@ WORKDIR /erp/bin
 RUN gramine-sgx-sign \
     --manifest /erp/bin/erp-processing-context.manifest \
     --output   /erp/bin/erp-processing-context.manifest.sgx \
+    --libpal   /usr/lib/x86_64-linux-gnu/gramine/sgx/libpal.so \
+    --key      /etc/enclave-key.pem
+
+RUN gramine-sgx-sign \
+    --manifest /erp/bin/exporter.manifest \
+    --output   /erp/bin/exporter.manifest.sgx \
     --libpal   /usr/lib/x86_64-linux-gnu/gramine/sgx/libpal.so \
     --key      /etc/enclave-key.pem
 
@@ -117,6 +126,7 @@ RUN apt-get update && \
     iputils-ping \
     iproute2 \
     apparmor-utils \
+    tcpdump \
   && rm -rf /var/lib/apt/lists/*
 
 # Backup users before copying from production
@@ -150,16 +160,24 @@ RUN echo 'export TPM_INTERFACE_TYPE=dev' >> /root/.bashrc
 # Copy application files
 COPY --chown=erp-processing-context:erp-processing-context debug /debug
 
-RUN chmod u+x /debug/erp/bin/erp-processing-context
+RUN chmod u+x /debug/erp/bin/erp-processing-context /debug/erp/bin/erp-medication-exporter
 RUN mkdir -p /var/config/debug/erp/bin \
   && touch /var/config/debug/erp/bin/erp-processing-context.token \
-  && ln -sf /var/config/debug/erp/bin/erp-processing-context.token /debug/erp/bin/erp-processing-context.token
+  && ln -sf /var/config/debug/erp/bin/erp-processing-context.token /debug/erp/bin/erp-processing-context.token \
+  && touch /var/config/debug/erp/bin/medication-exporter.token \
+  && ln -sf /var/config/debug/erp/bin/medication-exporter.token /debug/erp/bin/medication-exporter.token
 
 # Sign the manifest
 WORKDIR /debug/erp/bin
 RUN gramine-sgx-sign \
     --manifest /debug/erp/bin/erp-processing-context.manifest \
     --output   /debug/erp/bin/erp-processing-context.manifest.sgx \
+    --libpal   /usr/lib/x86_64-linux-gnu/gramine/sgx/libpal.so \
+    --key      /etc/enclave-key.pem
+
+RUN gramine-sgx-sign \
+    --manifest /debug/erp/bin/exporter.manifest \
+    --output   /debug/erp/bin/exporter.manifest.sgx \
     --libpal   /usr/lib/x86_64-linux-gnu/gramine/sgx/libpal.so \
     --key      /etc/enclave-key.pem
 

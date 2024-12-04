@@ -15,6 +15,8 @@
   /usr/lib/x86_64-linux-gnu/gramine/** r,
   /var/config/debug/erp/bin/erp-processing-context.token r,
   /var/config/erp/bin/erp-processing-context.token r,
+  /var/config/debug/erp/bin/medication-exporter.token r,
+  /var/config/erp/bin/medication-exporter.token r,
   /etc/ssl/openssl.cnf r,
   owner /debug/ r,
   owner /debug/erp/ r,

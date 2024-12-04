@@ -1,6 +1,6 @@
 [Unit]
 Description=Disables module loading
-After=network.target vau-config.service erp-processing-context-9085.service erp-processing-context-9086.service erp-processing-context-9087.service erp-processing-context-9088.service
+After=network.target vau-config.service erp-exporter.service erp-processing-context-9085.service erp-processing-context-9086.service erp-processing-context-9087.service erp-processing-context-9088.service
 
 [Service]
 Type=oneshot
