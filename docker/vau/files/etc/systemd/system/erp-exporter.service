@@ -19,8 +19,8 @@ Environment="ERP_LOG_DIR=/var/log/erp/9089/"
 EnvironmentFile=/var/config/erp-processing-context
 EnvironmentFile=/var/config/erp-exporter
 EnvironmentFile=-/var/config/erp-exporter-secrets
-ExecStart=/erp/bin/erp-medication-exporter
-#ExecStart=/erp/bin/medication-exporter
+ExecStart=gramine-sgx exporter
+#ExecStart=/erp/bin/erp-medication-exporter
 ExecStop=/bin/kill -15 $MAINPID
 
 [Install]
