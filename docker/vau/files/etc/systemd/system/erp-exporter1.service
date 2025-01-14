@@ -1,5 +1,5 @@
 [Unit]
-Description=Medication Exporter 9089
+Description=Medication Exporter 1
 After=network.target
 After=logdna-agent.service
 After=vau-config.service
@@ -15,6 +15,8 @@ Group=erp-processing-context
 
 WorkingDirectory=/erp/bin/
 Environment="SGX=1"
+Environment="ERP_MEDICATION_EXPORTER_ADMIN_SERVER_PORT=9999"
+Environment="ERP_ENROLMENT_SERVER_PORT=9191"
 Environment="ERP_LOG_DIR=/var/log/erp/9089/"
 EnvironmentFile=/var/config/erp-processing-context
 EnvironmentFile=/var/config/erp-exporter

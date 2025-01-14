@@ -1,0 +1,30 @@
+[Unit]
+Description=Medication Exporter 2
+After=network.target
+After=logdna-agent.service
+After=vau-config.service
+After=haproxy.service
+Before=disable-modules.service
+
+[Service]
+Restart=always
+RestartSec=10
+
+User=erp-processing-context
+Group=erp-processing-context
+
+WorkingDirectory=/erp/bin/
+Environment="SGX=1"
+Environment="ERP_MEDICATION_EXPORTER_ADMIN_SERVER_PORT=9998"
+Environment="ERP_ENROLMENT_ACTIVATE_FOR_PORT=9000"
+Environment="ERP_LOG_DIR=/var/log/erp/9089/"
+EnvironmentFile=/var/config/erp-processing-context
+EnvironmentFile=/var/config/erp-exporter
+EnvironmentFile=-/var/config/erp-exporter-secrets
+ExecStart=gramine-sgx exporter
+#ExecStart=/erp/bin/erp-medication-exporter
+ExecStop=/bin/kill -15 $MAINPID
+
+[Install]
+WantedBy=multi-user.target
+RequiredBy=disable-modules.service

@@ -57,7 +57,8 @@ RUN systemctl enable aesmd \
     vau-config \
     disable-modules \
     sync-logs \
-    erp-exporter.service \
+    erp-exporter1.service \
+    erp-exporter2.service \
     erp-processing-context-9085.service
 #    erp-processing-context-9086.service \
 #    erp-processing-context-9087.service \

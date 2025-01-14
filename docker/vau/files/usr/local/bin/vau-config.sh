@@ -6,8 +6,8 @@ set -o pipefail
 setup_processing_context () {
 
 echo "Disabling exporter as we'll be running processing context for ${HOST_MAC_ADDRESS}"  >> /var/log/vau-config.log
-systemctl disable erp-exporter
-systemctl stop erp-exporter
+systemctl disable erp-exporter1 erp-exporter2
+systemctl stop erp-exporter1 erp-exporter2
 
 echo "Starting download of configs for ${HOST_MAC_ADDRESS} in ${VAU_CONFIG_DIR}" >> /var/log/vau-config.log
 
