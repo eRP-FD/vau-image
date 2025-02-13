@@ -116,6 +116,7 @@ echo "Downloading configs for ${HOST_MAC_ADDRESS}" >> /var/log/vau-config.log
 mkdir -p ${HOST_MAC_ADDRESS}/{tsl,haproxy}
 wget ${VAU_CONFIG_URI}/erp-processing-context.env -O ${HOST_MAC_ADDRESS}/erp-processing-context.env
 wget ${VAU_CONFIG_URI}/erp-exporter -O ${HOST_MAC_ADDRESS}/erp-exporter
+wget ${VAU_CONFIG_URI}/SerNo2TID.csv -O ${HOST_MAC_ADDRESS}/SerNo2TID.csv || true
 wget ${VAU_CONFIG_URI}/POSTGRES_CERTIFICATE -O ${HOST_MAC_ADDRESS}/POSTGRES_CERTIFICATE
 wget ${VAU_CONFIG_URI}/POSTGRES_SSL_CERTIFICATE -O ${HOST_MAC_ADDRESS}/POSTGRES_SSL_CERTIFICATE
 
@@ -152,6 +153,7 @@ cp ${HOST_MAC_ADDRESS}/hosts /var/config/hosts
 # medication-exporter
 cp ${HOST_MAC_ADDRESS}/erp-processing-context.env /var/config/erp-processing-context
 cp ${HOST_MAC_ADDRESS}/erp-exporter /var/config/erp-exporter
+cp ${HOST_MAC_ADDRESS}/SerNo2TID.csv /var/config/erp/config/SerNo2TID.csv || true
 cp ${HOST_MAC_ADDRESS}/POSTGRES_CERTIFICATE /var/config/erp/config/POSTGRES_CERTIFICATE
 cp ${HOST_MAC_ADDRESS}/POSTGRES_SSL_CERTIFICATE /var/config/erp/config/POSTGRES_SSL_CERTIFICATE
 cp ${HOST_MAC_ADDRESS}/sslRootCaPath /var/config/erp/config/sslRootCaPath
