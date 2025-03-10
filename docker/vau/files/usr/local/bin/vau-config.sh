@@ -220,11 +220,31 @@ cd $VAU_CONFIG_DIR
 mkdir ${HOST_MAC_ADDRESS}
 
 # setting up logdna
-wget ${VAU_CONFIG_URI}/logdna.conf -O ${HOST_MAC_ADDRESS}/logdna.conf
-cp ${HOST_MAC_ADDRESS}/logdna.conf /var/config/logdna.conf
-systemctl enable logdna-agent.service
-systemctl start logdna-agent.service
-echo "logdna-agent.service enabled and started on ${HOST_MAC_ADDRESS}" >> /var/log/vau-config.log
+# logdna to be disabled if boot date is after 1743321600 - Mar 30th, 08:00UTC
+if [[ $(date '+%s') > 1743321600 ]]
+then
+        echo "logdna-agent.service will be disabled on ${HOST_MAC_ADDRESS} as we're booting after discontinuation date"  >> /var/log/vau-config.log
+        systemctl disable logdna-agent.service
+        systemctl stop logdna-agent.service
+else
+        echo "logdna-agent.service will be enabled and started on ${HOST_MAC_ADDRESS} as we're booting before discontinuation date"  >> /var/log/vau-config.log
+        wget ${VAU_CONFIG_URI}/logdna.conf -O ${HOST_MAC_ADDRESS}/logdna.conf
+        cp ${HOST_MAC_ADDRESS}/logdna.conf /var/config/logdna.conf
+        systemctl enable logdna-agent.service
+        systemctl start logdna-agent.service
+        echo "logdna-agent.service enabled and started on ${HOST_MAC_ADDRESS}" >> /var/log/vau-config.log
+fi
+
+# set up Cloud Logs agent
+wget ${VAU_CONFIG_URI}/fluent-bit.conf -O ${HOST_MAC_ADDRESS}/fluent-bit.conf
+wget ${VAU_CONFIG_URI}/fluent-bit-secrets  -O ${HOST_MAC_ADDRESS}/fluent-bit-secrets
+wget ${VAU_CONFIG_URI}/parsers.conf  -O ${HOST_MAC_ADDRESS}/parsers.conf
+cp ${HOST_MAC_ADDRESS}/fluent-bit.conf /var/config/fluent-bit.conf
+cp ${HOST_MAC_ADDRESS}/fluent-bit-secrets /var/config/fluent-bit-secrets
+cp ${HOST_MAC_ADDRESS}/parsers.conf /var/config/parsers.conf
+systemctl enable fluent-bit.service
+systemctl start fluent-bit.service
+echo "fluent-bit.service enabled and started on ${HOST_MAC_ADDRESS}" >> /var/log/vau-config.log
 
 # get config files based on role (exporter or processing context)
 echo "Getting role for ${HOST_MAC_ADDRESS}" >> /var/log/vau-config.log
