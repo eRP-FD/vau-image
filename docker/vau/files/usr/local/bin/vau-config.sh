@@ -226,6 +226,7 @@ then
         echo "logdna-agent.service will be disabled on ${HOST_MAC_ADDRESS} as we're booting after discontinuation date"  >> /var/log/vau-config.log
         systemctl disable logdna-agent.service
         systemctl stop logdna-agent.service
+        echo "logdna-agent.service disabled and stopped on ${HOST_MAC_ADDRESS}" >> /var/log/vau-config.log
 else
         echo "logdna-agent.service will be enabled and started on ${HOST_MAC_ADDRESS} as we're booting before discontinuation date"  >> /var/log/vau-config.log
         wget ${VAU_CONFIG_URI}/logdna.conf -O ${HOST_MAC_ADDRESS}/logdna.conf

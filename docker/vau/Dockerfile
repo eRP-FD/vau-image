@@ -1,10 +1,10 @@
 # ------------------------------------------  PRODUCTION --------------------------------------------------------------
 
 # https://<gitrepo>/eRp/vau-base-image
-ARG VAU_BASE_IMAGE_VERSION=v-2.13.2
+ARG VAU_BASE_IMAGE_VERSION=v-2.14.0-B135
 
 # Should be the same as what the VAU base image is based on
-ARG DEBUG_IMAGE_BASE=de.icr.io/erp_dev/ubuntu-jammy:20240911.1
+ARG DEBUG_IMAGE_BASE=de.icr.io/erp_dev/ubuntu-jammy:20250126
 
 FROM de.icr.io/erp_dev/vau-base-image:${VAU_BASE_IMAGE_VERSION} as production
 
