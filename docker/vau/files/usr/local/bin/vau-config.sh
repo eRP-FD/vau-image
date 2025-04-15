@@ -205,6 +205,9 @@ chown -R erp-processing-context:erp-processing-context /var/config
 HOST_MAC_ADDRESS=$(cat /sys/class/net/bond1/address | tr ':' '-')
 echo "Starting configuration provisioning for ${HOST_MAC_ADDRESS}" >> /var/log/vau-config.log
 
+# add hostname to /etc/hosts to speed up rsyslog startup
+printf "$(grep -E 'fixed-address|host-name' /var/lib/dhcp/dhclient.leases | head -n2 | sed -e 's/^.* //' -e 's/;//' -e 's/"//g' | sort | tr '\n' ' ')\n" >> /etc/hosts
+
 # get IMGREPO IP
 IMGREPO_IP="$(grep dhcp-server-identifier /var/lib/dhcp/dhclient.leases | uniq | cut -d' ' -f5 | cut -d';' -f1)"
 VAU_CONFIG_URI="${IMGREPO_IP}/vau-config/${HOST_MAC_ADDRESS}"

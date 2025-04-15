@@ -1,7 +1,7 @@
 # ------------------------------------------  PRODUCTION --------------------------------------------------------------
 
 # https://<gitrepo>/eRp/vau-base-image
-ARG VAU_BASE_IMAGE_VERSION=v-2.14.1
+ARG VAU_BASE_IMAGE_VERSION=v-2.15.0-B00
 
 # Should be the same as what the VAU base image is based on
 ARG DEBUG_IMAGE_BASE=de.icr.io/erp_dev/ubuntu-jammy:20250126
