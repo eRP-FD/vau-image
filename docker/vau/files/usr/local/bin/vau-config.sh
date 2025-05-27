@@ -51,6 +51,9 @@ cp ${HOST_MAC_ADDRESS}/vault.json /var/config/vault.json
 # hosts
 cp ${HOST_MAC_ADDRESS}/hosts /var/config/hosts
 
+# add hostname to /etc/hosts to speed up rsyslog startup
+printf "$(grep -E 'fixed-address|host-name' /var/lib/dhcp/dhclient.leases | head -n2 | sed -e 's/^.* //' -e 's/;//' -e 's/"//g' | sort | tr '\n' ' ')\n" >> /etc/hosts
+
 # processing-context
 cp ${HOST_MAC_ADDRESS}/erp-processing-context.env /var/config/erp-processing-context
 cp ${HOST_MAC_ADDRESS}/POSTGRES_CERTIFICATE /var/config/erp/config/POSTGRES_CERTIFICATE
@@ -150,6 +153,9 @@ cp ${HOST_MAC_ADDRESS}/vault.json /var/config/vault.json
 # hosts
 cp ${HOST_MAC_ADDRESS}/hosts /var/config/hosts
 
+# add hostname to /etc/hosts to speed up rsyslog startup
+printf "$(grep -E 'fixed-address|host-name' /var/lib/dhcp/dhclient.leases | head -n2 | sed -e 's/^.* //' -e 's/;//' -e 's/"//g' | sort | tr '\n' ' ')\n" >> /etc/hosts
+
 # medication-exporter
 cp ${HOST_MAC_ADDRESS}/erp-processing-context.env /var/config/erp-processing-context
 cp ${HOST_MAC_ADDRESS}/erp-exporter /var/config/erp-exporter
@@ -204,9 +210,6 @@ chown -R erp-processing-context:erp-processing-context /var/config
 # get MAC address to be used as config identifier
 HOST_MAC_ADDRESS=$(cat /sys/class/net/bond1/address | tr ':' '-')
 echo "Starting configuration provisioning for ${HOST_MAC_ADDRESS}" >> /var/log/vau-config.log
-
-# add hostname to /etc/hosts to speed up rsyslog startup
-printf "$(grep -E 'fixed-address|host-name' /var/lib/dhcp/dhclient.leases | head -n2 | sed -e 's/^.* //' -e 's/;//' -e 's/"//g' | sort | tr '\n' ' ')\n" >> /etc/hosts
 
 # get IMGREPO IP
 IMGREPO_IP="$(grep dhcp-server-identifier /var/lib/dhcp/dhclient.leases | uniq | cut -d' ' -f5 | cut -d';' -f1)"

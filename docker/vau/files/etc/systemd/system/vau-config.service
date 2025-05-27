@@ -30,7 +30,7 @@ ExecStartPre=/bin/ln -sf /var/config/hosts /etc/hosts
 ExecStartPre=/usr/sbin/dhclient bond1
 ExecStart=/bin/bash /usr/local/bin/vau-config.sh
 RemainAfterExit=yes
-Restart=never
+Restart=no
 
 [Install]
 WantedBy=multi-user.target

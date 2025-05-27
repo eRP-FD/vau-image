@@ -1,4 +1,4 @@
-FROM de.icr.io/erp_dev/ubuntu-jammy:20250126
+FROM de.icr.io/erp_dev/ubuntu-jammy:20250404
 
 RUN apt-get update
 RUN apt-get -y install --no-install-recommends \
