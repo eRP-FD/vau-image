@@ -1,7 +1,7 @@
 pipeline {
     agent {
         node {
-            label 'agent01'
+            label 'dockerstage'
         }
     }
 
