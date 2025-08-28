@@ -1,7 +1,6 @@
 [Unit]
 Description=eRp Processing Context 9086
 After=network.target
-After=logdna-agent.service
 After=vau-config.service
 After=haproxy.service
 Before=disable-modules.service
@@ -16,6 +15,7 @@ Group=erp-processing-context
 WorkingDirectory=/erp/bin/
 Environment="SGX=1"
 Environment="ERP_SERVER_PORT=9086"
+Environment="ERP_ADMIN_SERVER_PORT=9998"
 Environment="ERP_LOG_DIR=/var/log/erp/9086/"
 EnvironmentFile=/var/config/erp-processing-context
 EnvironmentFile=-/var/config/erp-processing-context-secrets

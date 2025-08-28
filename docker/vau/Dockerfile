@@ -1,10 +1,10 @@
 # ------------------------------------------  PRODUCTION --------------------------------------------------------------
 
 # https://<gitrepo>/eRp/vau-base-image
-ARG VAU_BASE_IMAGE_VERSION=v-2.16.1
+ARG VAU_BASE_IMAGE_VERSION=v-2.17.1
 
 # Should be the same as what the VAU base image is based on
-ARG DEBUG_IMAGE_BASE=de.icr.io/erp_dev/ubuntu-jammy:20250404
+ARG DEBUG_IMAGE_BASE=de.icr.io/erp_dev/ubuntu-jammy:20250714
 
 FROM de.icr.io/erp_dev/vau-base-image:${VAU_BASE_IMAGE_VERSION} as production
 
@@ -18,7 +18,7 @@ COPY files/usr/local/bin/* /usr/local/bin/
 RUN mkdir -p /var/config/{erp,haproxy,rsyslog.d} \
     && mkdir -p /var/config/erp/{bin,config,tsl,hsm} \
     && mkdir -p /var/config/haproxy/secrets \
-    && touch /var/config/{hosts,dragent.yaml,logdna.conf,vault.json,erp-processing-context,erp-processing-context-secrets,erp-exporter,erp-exporter-secrets} \
+    && touch /var/config/{hosts,dragent.yaml,vault.json,erp-processing-context,erp-processing-context-secrets,erp-exporter,erp-exporter-secrets} \
     && touch /var/config/erp/bin/erp-processing-context.token \
     && touch /var/config/erp/bin/medication-exporter.token \
     && touch /var/config/erp/config/{POSTGRES_CERTIFICATE,POSTGRES_SSL_CERTIFICATE,POSTGRES_SSL_KEY,TSL_SSL_cert_chain.pem,sslRootCaPath} \
@@ -31,7 +31,6 @@ RUN mkdir -p /var/config/{erp,haproxy,rsyslog.d} \
 # Create symlinks for all configs and logging support
 RUN mkdir -p /var/log/erp/{9085..9088} /etc/sysconfig /erp/bin \
     && touch /var/log/vau-config.log \
-    && ln -fs /var/config/logdna.conf /etc/logdna.conf \
     && ln -fs /var/config/dragent.yaml /opt/draios/etc/dragent.yaml \
     && ln -fs /var/config/haproxy/haproxy /etc/sysconfig/haproxy \
     && ln -sf /var/config/erp/bin/erp-processing-context.token /erp/bin/erp-processing-context.token \
@@ -59,8 +58,8 @@ RUN systemctl enable aesmd \
     sync-logs \
     erp-exporter1.service \
     erp-exporter2.service \
-    erp-processing-context-9085.service
-#    erp-processing-context-9086.service \
+    erp-processing-context-9085.service \
+    erp-processing-context-9086.service
 #    erp-processing-context-9087.service \
 #    erp-processing-context-9088.service
 
@@ -104,7 +103,6 @@ RUN rm -rf /boot \
     && rm -f /usr/bin/su
 
 # Create the aide database, all filesystem changes should be done before this step
-RUN chmod 644 /etc/logrotate.d/logdna-agent
 RUN aide -ic /etc/aide/aide.conf && \
     mv /etc/aide/aide.db.new /etc/aide/aide.db
 

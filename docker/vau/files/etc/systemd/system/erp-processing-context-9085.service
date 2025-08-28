@@ -1,7 +1,6 @@
 [Unit]
 Description=eRp Processing Context 9085
 After=network.target
-After=logdna-agent.service
 After=vau-config.service
 After=haproxy.service
 Before=disable-modules.service
@@ -18,6 +17,7 @@ Environment="SGX=1"
 Environment="ERP_SERVER_PORT=9085"
 Environment="ERP_ENROLMENT_SERVER_PORT=9191"
 Environment="ERP_ENROLMENT_ACTIVATE_FOR_PORT=9085"
+Environment="ERP_ADMIN_SERVER_PORT=9999"
 Environment="ERP_LOG_DIR=/var/log/erp/9085/"
 EnvironmentFile=/var/config/erp-processing-context
 EnvironmentFile=-/var/config/erp-processing-context-secrets

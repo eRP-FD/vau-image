@@ -12,7 +12,7 @@ Contains different configuration files to be copied into the /etc folder in the 
 - /etc/systemd/system - systemd service definition files
     - disable-modules - oneshot service to disable kernel module loading after boot
     - erp-processing-context-9085-8 - systemd unit definitions for the processing-context binary started with gramine
-    - sync-logs - oneshot service to make boot logs available to logdna
+    - sync-logs - oneshot service to make boot logs available to IBM Cloud Logs
     - vau-config - oneshot service responsible for downloading configuration files and secrets from Hashicorp Vault
     For more information, please see [the script](usr/local/bin/vau-config.sh)
 - /etc/udev/rules.d - udev rules for configuring access to tpm and gramine/sgx devices

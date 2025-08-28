@@ -1,7 +1,6 @@
 [Unit]
 Description=eRp Processing Context 9088
 After=network.target
-After=logdna-agent.service
 After=vau-config.service
 After=haproxy.service
 Before=disable-modules.service

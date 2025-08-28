@@ -1,10 +1,10 @@
 [Unit]
-Description=Send boot logs to journald/logdna
-After=network.target vau-config.service logdna-agent.service
+Description=Send boot logs to journald
+After=network.target vau-config.service
 
 [Service]
-User=erp-processing-context
-Group=erp-processing-context
+User=root
+Group=root
 
 Type=oneshot
 ExecStart=/usr/bin/logger -t VAU_config -f /var/log/vau-config.log
