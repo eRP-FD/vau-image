@@ -1,7 +1,7 @@
 # ------------------------------------------  PRODUCTION --------------------------------------------------------------
 
 # https://<gitrepo>/eRp/vau-base-image
-ARG VAU_BASE_IMAGE_VERSION=v-2.17.1
+ARG VAU_BASE_IMAGE_VERSION=v-2.17.2
 
 # Should be the same as what the VAU base image is based on
 ARG DEBUG_IMAGE_BASE=de.icr.io/erp_dev/ubuntu-jammy:20250714
@@ -18,7 +18,7 @@ COPY files/usr/local/bin/* /usr/local/bin/
 RUN mkdir -p /var/config/{erp,haproxy,rsyslog.d} \
     && mkdir -p /var/config/erp/{bin,config,tsl,hsm} \
     && mkdir -p /var/config/haproxy/secrets \
-    && touch /var/config/{hosts,dragent.yaml,vault.json,erp-processing-context,erp-processing-context-secrets,erp-exporter,erp-exporter-secrets} \
+    && touch /var/config/{hosts,dragent.yaml,prometheus.yaml,vault.json,erp-processing-context,erp-processing-context-secrets,erp-exporter,erp-exporter-secrets} \
     && touch /var/config/erp/bin/erp-processing-context.token \
     && touch /var/config/erp/bin/medication-exporter.token \
     && touch /var/config/erp/config/{POSTGRES_CERTIFICATE,POSTGRES_SSL_CERTIFICATE,POSTGRES_SSL_KEY,TSL_SSL_cert_chain.pem,sslRootCaPath} \
@@ -32,6 +32,7 @@ RUN mkdir -p /var/config/{erp,haproxy,rsyslog.d} \
 RUN mkdir -p /var/log/erp/{9085..9088} /etc/sysconfig /erp/bin \
     && touch /var/log/vau-config.log \
     && ln -fs /var/config/dragent.yaml /opt/draios/etc/dragent.yaml \
+    && ln -fs /var/config/prometheus.yaml /opt/draios/etc/prometheus.yaml \
     && ln -fs /var/config/haproxy/haproxy /etc/sysconfig/haproxy \
     && ln -sf /var/config/erp/bin/erp-processing-context.token /erp/bin/erp-processing-context.token \
     && ln -sf /var/config/erp/bin/medication-exporter.token /erp/bin/medication-exporter.token

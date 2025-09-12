@@ -26,6 +26,7 @@ wget ${VAU_CONFIG_URI}/TSL_SSL_cert_chain.pem -O ${HOST_MAC_ADDRESS}/TSL_SSL_cer
 
 wget ${VAU_CONFIG_URI}/rsyslog-forward.conf -O ${HOST_MAC_ADDRESS}/rsyslog-forward.conf
 wget ${VAU_CONFIG_URI}/dragent.yaml -O ${HOST_MAC_ADDRESS}/dragent.yaml
+wget ${VAU_CONFIG_URI}/prometheus.yaml -O ${HOST_MAC_ADDRESS}/prometheus.yaml
 
 wget ${VAU_CONFIG_URI}/tsl/tsl-1.xml -O ${HOST_MAC_ADDRESS}/tsl/tsl-1.xml
 wget ${VAU_CONFIG_URI}/tsl/tsl-ca.der -O ${HOST_MAC_ADDRESS}/tsl/tsl-ca.der
@@ -70,6 +71,7 @@ cp ${HOST_MAC_ADDRESS}/rsyslog-forward.conf /var/config/rsyslog.d/rsyslog-forwar
 
 #sysdig
 cp ${HOST_MAC_ADDRESS}/dragent.yaml /var/config/dragent.yaml
+cp ${HOST_MAC_ADDRESS}/prometheus.yaml /var/config/prometheus.yaml
 
 #haproxy
 cp ${HOST_MAC_ADDRESS}/haproxy/haproxy.env /var/config/haproxy/haproxy
@@ -128,6 +130,7 @@ wget ${VAU_CONFIG_URI}/TSL_SSL_cert_chain.pem -O ${HOST_MAC_ADDRESS}/TSL_SSL_cer
 
 wget ${VAU_CONFIG_URI}/rsyslog-forward.conf -O ${HOST_MAC_ADDRESS}/rsyslog-forward.conf
 wget ${VAU_CONFIG_URI}/dragent.yaml -O ${HOST_MAC_ADDRESS}/dragent.yaml
+wget ${VAU_CONFIG_URI}/prometheus.yaml -O ${HOST_MAC_ADDRESS}/prometheus.yaml
 
 wget ${VAU_CONFIG_URI}/tsl/tsl-1.xml -O ${HOST_MAC_ADDRESS}/tsl/tsl-1.xml
 wget ${VAU_CONFIG_URI}/tsl/tsl-ca.der -O ${HOST_MAC_ADDRESS}/tsl/tsl-ca.der
@@ -174,6 +177,7 @@ cp ${HOST_MAC_ADDRESS}/rsyslog-forward.conf /var/config/rsyslog.d/rsyslog-forwar
 
 #sysdig
 cp ${HOST_MAC_ADDRESS}/dragent.yaml /var/config/dragent.yaml
+cp ${HOST_MAC_ADDRESS}/prometheus.yaml /var/config/prometheus.yaml
 
 #haproxy
 cp ${HOST_MAC_ADDRESS}/haproxy/haproxy.env /var/config/haproxy/haproxy
