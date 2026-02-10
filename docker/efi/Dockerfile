@@ -1,6 +1,6 @@
-FROM de.icr.io/erp_dev/ubuntu-jammy:20251001
+FROM de.icr.io/erp_dev/ubuntu-jammy:20260109
 
-ENV KERNEL_VERSION=5.19.0-41-generic
+ENV KERNEL_VERSION=6.8.0-90-generic
 
 SHELL ["/bin/bash", "-c"]
 
