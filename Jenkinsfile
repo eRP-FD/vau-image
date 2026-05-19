@@ -13,7 +13,7 @@ pipeline {
     environment {
          DEBUG_ROOT_HASH = credentials('erp_vau_debug_root_hash')
          VAULT_SECRET_ID = sh (script: 'openssl rand -base64 12', returnStdout: true).trim()
-         VAULT_SIGN_KEYS_PATH = "certs_20240422"
+         VAULT_SIGN_KEYS_PATH = "certs_20260428"
      }
 
     stages {
@@ -73,7 +73,7 @@ pipeline {
                         sh 'docker rmi -f production_filesystem debug_filesystem'
                         sh 'rm -rf docker/vau/files/certs/*'
                     }
-                    createSummary('user.png').appendText("<h3>Vault Secret</h3><p>Value: <b>${env.VAULT_SECRET_ID}</b></p>", false, false, false, 'black')
+                    addSummary(icon: 'user.png', text: "<h3>Vault Secret</h3><p>Value: <b>${env.VAULT_SECRET_ID}</b></p>")
                 }
             }
         }
