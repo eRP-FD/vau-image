@@ -1,4 +1,4 @@
-FROM de.icr.io/erp_dev/ubuntu-jammy:20260810
+FROM de.icr.io/erp_dev/ubuntu-jammy:20260901.2
 
 ENV KERNEL_VERSION=6.8.0-136-generic
 
