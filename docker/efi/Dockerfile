@@ -1,4 +1,4 @@
-FROM de.icr.io/erp_dev/ubuntu-jammy:20260924.1
+FROM de.icr.io/erp_dev/ubuntu-noble:20261024.1
 
 ENV KERNEL_VERSION=6.8.0-136-generic
 
@@ -12,6 +12,7 @@ RUN apt-get update --fix-missing && \
     sbsigntool \
     initramfs-tools \
     systemd-sysv \
+    systemd-boot-efi \
     gnupg \
     linux-image-unsigned-${KERNEL_VERSION} \
     linux-modules-${KERNEL_VERSION} \
@@ -39,9 +40,9 @@ RUN update-initramfs -c -k ${KERNEL_VERSION}
 RUN echo "BOOT_IMAGE=/boot/vmlinuz boot=pxe maxTryCount=2 audit=1 audit_backlog_limit=8192 security=apparmor apparmor=1 ipv6.disable=1 oops=panic init_on_free=1" > cmdline.txt
 
 RUN objcopy \
---add-section .cmdline=cmdline.txt --change-section-vma .cmdline=0x30000 \
---add-section .linux=/boot/vmlinuz-${KERNEL_VERSION} --change-section-vma .linux=0x40000 \
---add-section .initrd=/boot/initrd.img-${KERNEL_VERSION} --change-section-vma .initrd=0x3000000 \
+--add-section .cmdline=cmdline.txt --change-section-vma .cmdline=0x14dfa5000 \
+--add-section .linux=/boot/vmlinuz-${KERNEL_VERSION} --change-section-vma .linux=0x14dfa6000 \
+--add-section .initrd=/boot/initrd.img-${KERNEL_VERSION} --change-section-vma .initrd=0x14ee04000 \
 /usr/lib/systemd/boot/efi/linuxx64.efi.stub pxe-boot.efi
 
 # Certificates are read from Hashicorp Vault

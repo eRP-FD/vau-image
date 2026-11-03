@@ -27,7 +27,6 @@ Type=oneshot
 PermissionsStartOnly=true
 ExecStartPre=/bin/ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf
 ExecStartPre=/bin/ln -sf /var/config/hosts /etc/hosts
-ExecStartPre=/usr/sbin/dhclient bond1
 ExecStart=/bin/bash /usr/local/bin/vau-config.sh
 RemainAfterExit=yes
 Restart=no
