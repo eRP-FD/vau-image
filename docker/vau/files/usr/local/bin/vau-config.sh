@@ -55,7 +55,7 @@ cp ${HOST_MAC_ADDRESS}/vault.json /var/config/vault.json
 cp ${HOST_MAC_ADDRESS}/hosts /var/config/hosts
 
 # add hostname to /etc/hosts to speed up rsyslog startup
-{ awk -F= '/IPV4ADDR|HOSTNAME/ {gsub(/'\''/, "", $2); print $2}' /run/net-en*.conf | head -n2 | sort | xargs; printf '\n'; } >> /etc/hosts
+printf "$(grep -E 'fixed-address|host-name' /var/lib/dhcp/dhclient.leases | head -n2 | sed -e 's/^.* //' -e 's/;//' -e 's/"//g' | sort | tr '\n' ' ')\n" >> /etc/hosts
 
 # processing-context
 cp ${HOST_MAC_ADDRESS}/erp-processing-context.env /var/config/erp-processing-context
@@ -163,7 +163,7 @@ cp ${HOST_MAC_ADDRESS}/vault.json /var/config/vault.json
 cp ${HOST_MAC_ADDRESS}/hosts /var/config/hosts
 
 # add hostname to /etc/hosts to speed up rsyslog startup
-{ awk -F= '/IPV4ADDR|HOSTNAME/ {gsub(/'\''/, "", $2); print $2}' /run/net-en*.conf | head -n2 | sort | xargs; printf '\n'; } >> /etc/hosts
+printf "$(grep -E 'fixed-address|host-name' /var/lib/dhcp/dhclient.leases | head -n2 | sed -e 's/^.* //' -e 's/;//' -e 's/"//g' | sort | tr '\n' ' ')\n" >> /etc/hosts
 
 # medication-exporter
 cp ${HOST_MAC_ADDRESS}/erp-processing-context.env /var/config/erp-processing-context
@@ -224,7 +224,7 @@ HOST_MAC_ADDRESS=$(cat /sys/class/net/bond1/address | tr ':' '-')
 echo "Starting configuration provisioning for ${HOST_MAC_ADDRESS}" >> /var/log/vau-config.log
 
 # get IMGREPO IP
-IMGREPO_IP="$(ip -o -4 addr show | awk '$4 ~ /^192\.168\./ {split($4,a,/[.\/]/); printf "%d.%d.%d.133", a[1],a[2],a[3]+2; exit}')"
+IMGREPO_IP="$(grep dhcp-server-identifier /var/lib/dhcp/dhclient.leases | uniq | cut -d' ' -f5 | cut -d';' -f1)"
 VAU_CONFIG_URI="${IMGREPO_IP}/vau-config/${HOST_MAC_ADDRESS}"
 
 echo "Setting config download URI to ${VAU_CONFIG_URI}" >> /var/log/vau-config.log

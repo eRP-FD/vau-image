@@ -1,17 +1,17 @@
-FROM de.icr.io/erp_dev/ubuntu-noble:20261110
+FROM de.icr.io/erp_dev/ubuntu-jammy:20260924.1
 
-ENV KERNEL_VERSION=6.8.0-149-generic
+ENV KERNEL_VERSION=6.8.0-136-generic
 
 SHELL ["/bin/bash", "-c"]
 
 RUN apt-get update --fix-missing && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y wget \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y binutils \
+    wget \
     overlayroot \
+    isc-dhcp-client \
     sbsigntool \
     initramfs-tools \
     systemd-sysv \
-    systemd-boot-efi \
-    systemd-ukify \
     gnupg \
     linux-image-unsigned-${KERNEL_VERSION} \
     linux-modules-${KERNEL_VERSION} \
@@ -36,16 +36,14 @@ RUN chmod +x /usr/share/initramfs-tools/hooks/wget
 
 RUN update-initramfs -c -k ${KERNEL_VERSION}
 
+RUN echo "BOOT_IMAGE=/boot/vmlinuz boot=pxe maxTryCount=2 audit=1 audit_backlog_limit=8192 security=apparmor apparmor=1 ipv6.disable=1 oops=panic init_on_free=1" > cmdline.txt
+
+RUN objcopy \
+--add-section .cmdline=cmdline.txt --change-section-vma .cmdline=0x30000 \
+--add-section .linux=/boot/vmlinuz-${KERNEL_VERSION} --change-section-vma .linux=0x40000 \
+--add-section .initrd=/boot/initrd.img-${KERNEL_VERSION} --change-section-vma .initrd=0x3000000 \
+/usr/lib/systemd/boot/efi/linuxx64.efi.stub pxe-boot.efi
+
 # Certificates are read from Hashicorp Vault
 COPY certs/* ./
-
-RUN ukify build \
-    --stub=/usr/lib/systemd/boot/efi/linuxx64.efi.stub \
-    --linux=/boot/vmlinuz-${KERNEL_VERSION} \
-    --initrd=/boot/initrd.img-${KERNEL_VERSION} \
-    --cmdline='BOOT_IMAGE=/boot/vmlinuz boot=pxe maxTryCount=2 audit=1 audit_backlog_limit=8192 security=apparmor apparmor=1 ipv6.disable=1 oops=panic init_on_free=1' \
-    --uname=${KERNEL_VERSION} \
-    --secureboot-private-key=db.key \
-    --secureboot-certificate=db.crt \
-    --output=pxe-boot.efi.signed
-
+RUN sbsign --output pxe-boot.efi.signed --key db.key --cert db.crt pxe-boot.efi

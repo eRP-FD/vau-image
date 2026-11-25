@@ -41,7 +41,7 @@ mountroot()
         configure_networking || echo c > /proc/sysrq-trigger
 
         # prepare image repo uri
-        imageRepoIP="$(ip -o -4 addr show | awk '$4 ~ /^192\.168\./ {split($4,a,/[.\/]/); printf "%d.%d.%d.133\n", a[1],a[2],a[3]+2; exit}')"
+        imageRepoIP="$(grep dhcp-server-identifier /var/lib/dhcp/dhclient.leases | uniq | cut -d' ' -f5 | cut -d';' -f1)"
         imageRepoURI="${imageRepoScheme}://${imageRepoIP}:${imageRepoPort}/${imageRepoPath}"
 
         # download rootfs
